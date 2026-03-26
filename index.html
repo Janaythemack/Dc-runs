@@ -27,4 +27,562 @@
     --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  body { background: var(--bg); color: var(--text); font-family: 'Barlow',​​​​​​​​​​​​​​​​
+  body { background: var(--bg); color: var(--text); font-family: 'Barlow', sans-serif; min-height: 100vh; overflow-x: hidden; }
+  .header { background: var(--bg); padding: calc(var(--safe-top) + 14px) 20px 14px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .header-left h1 { font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 800; letter-spacing: 0.5px; line-height: 1; }
+  .header-left h1 span { color: var(--accent); }
+  .header-left p { font-size: 11px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 2px; }
+  .header-badge { background: var(--accent); color: #0d0f14; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; cursor: pointer; }
+  .tabs { display: flex; gap: 6px; padding: 12px 16px; overflow-x: auto; scrollbar-width: none; background: var(--bg); position: sticky; top: 69px; z-index: 99; border-bottom: 1px solid var(--border); }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { flex-shrink: 0; padding: 7px 14px; border-radius: 20px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 0.5px; text-transform: uppercase; cursor: pointer; border: 1.5px solid var(--border); color: var(--muted); background: transparent; transition: all 0.2s; }
+  .tab.active { border-color: transparent; color: #0d0f14; }
+  .tab[data-tab="all"].active { background: var(--text); }
+  .tab[data-tab="inout"].active { background: var(--run); }
+  .tab[data-tab="runto"].active { background: var(--train-to); }
+  .tab[data-tab="trainrun"].active { background: var(--train-from); }
+  .tab[data-tab="drive"].active { background: var(--drive); }
+  .tab[data-tab="progress"].active { background: var(--accent3); }
+  .main { padding: 16px; padding-bottom: calc(var(--safe-bottom) + 24px); }
+  .section-label { display: flex; align-items: center; gap: 10px; margin: 20px 0 12px; }
+  .section-label:first-child { margin-top: 4px; }
+  .section-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .section-title { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+  .section-line { flex: 1; height: 1px; background: var(--border); }
+  .route-card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; margin-bottom: 12px; overflow: hidden; transition: transform 0.15s; cursor: pointer; }
+  .route-card:active { transform: scale(0.98); }
+  .card-header { padding: 16px; display: flex; align-items: flex-start; gap: 14px; }
+  .card-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .card-info { flex: 1; min-width: 0; }
+  .card-name { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 700; line-height: 1.1; }
+  .card-meta { display: flex; gap: 8px; margin-top: 5px; flex-wrap: wrap; }
+  .pill { font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px; background: var(--surface); color: var(--muted); }
+  .pill.highlight { background: rgba(232,240,96,0.12); color: var(--accent); }
+  .card-chevron { font-size: 18px; color: var(--muted); margin-top: 2px; transition: transform 0.25s; flex-shrink: 0; }
+  .route-card.expanded .card-chevron { transform: rotate(90deg); }
+  .card-body { display: none; border-top: 1px solid var(--border); }
+  .route-card.expanded .card-body { display: block; }
+  .card-section { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+  .card-section:last-child { border-bottom: none; }
+  .card-section-title { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  .steps { display: flex; flex-direction: column; }
+  .step { display: flex; gap: 12px; }
+  .step-left { display: flex; flex-direction: column; align-items: center; width: 28px; flex-shrink: 0; }
+  .step-num { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 800; flex-shrink: 0; }
+  .step-line { width: 2px; flex: 1; min-height: 14px; background: var(--border); margin: 4px 0; }
+  .step:last-child .step-line { display: none; }
+  .step-content { padding-bottom: 14px; flex: 1; }
+  .step:last-child .step-content { padding-bottom: 0; }
+  .step-label { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; line-height: 1.2; }
+  .step-desc { font-size: 13px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+  .step-badge { display: inline-block; font-size: 10px; font-weight: 600; letter-spacing: 0.5px; padding: 2px 8px; border-radius: 10px; margin-top: 5px; }
+  .metro-box { background: var(--surface); border-radius: 12px; padding: 12px 14px; }
+  .metro-row { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .metro-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .metro-row:first-child { padding-top: 0; }
+  .metro-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .metro-label { color: var(--muted); font-size: 11px; width: 52px; flex-shrink: 0; }
+  .metro-val { flex: 1; font-weight: 500; }
+  .map-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px; border-radius: 12px; font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; text-decoration: none; color: #0d0f14; }
+  .screen { display: none; }
+  .screen.active { display: block; }
+  .prog-hero { background: linear-gradient(135deg, #1a1f2e, #1e2230); border: 1px solid var(--border); border-radius: 20px; padding: 24px; margin-bottom: 16px; text-align: center; }
+  .prog-distance-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+  .prog-distance-val { font-family: 'Barlow Condensed', sans-serif; font-size: 72px; font-weight: 800; color: var(--accent); line-height: 1; }
+  .prog-distance-unit { font-family: 'Barlow Condensed', sans-serif; font-size: 24px; font-weight: 600; color: var(--muted); }
+  .prog-goal-label { font-size: 12px; color: var(--muted); margin-top: 8px; }
+  .prog-goal-label span { color: var(--accent3); font-weight: 600; }
+  .prog-bar-wrap { margin: 20px 0 0; }
+  .prog-bar-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+  .prog-bar-track { height: 8px; background: var(--border); border-radius: 8px; overflow: hidden; }
+  .prog-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 8px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+  .milestones { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .milestone-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 14px; text-align: center; cursor: pointer; }
+  .milestone-card.reached { border-color: var(--accent); background: rgba(232,240,96,0.05); }
+  .milestone-icon { font-size: 24px; margin-bottom: 6px; }
+  .milestone-dist { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 800; line-height: 1; }
+  .milestone-label { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .milestone-card.reached .milestone-dist { color: var(--accent); }
+  .log-section { margin-top: 4px; }
+  .log-title { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  .log-form { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 14px; }
+  .log-row { display: flex; gap: 10px; margin-bottom: 10px; }
+  .log-input-wrap { flex: 1; }
+  .log-input-wrap label { display: block; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+  .log-input { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; color: var(--text); font-family: 'Barlow', sans-serif; font-size: 15px; outline: none; }
+  .log-input:focus { border-color: var(--accent); }
+  .log-select { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; color: var(--text); font-family: 'Barlow', sans-serif; font-size: 15px; outline: none; appearance: none; }
+  .log-submit { width: 100%; background: var(--accent); color: #0d0f14; border: none; border-radius: 12px; padding: 13px; font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; }
+  .run-history { display: flex; flex-direction: column; gap: 8px; }
+  .run-entry { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; gap: 12px; }
+  .run-entry-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; background: var(--surface); flex-shrink: 0; }
+  .run-entry-info { flex: 1; }
+  .run-entry-route { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; }
+  .run-entry-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .run-entry-dist { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 800; color: var(--accent); }
+  .run-entry-dist span { font-size: 12px; font-weight: 400; color: var(--muted); }
+  .run-delete { background: none; border: none; color: var(--muted); font-size: 16px; cursor: pointer; padding: 4px; }
+  .empty-state { text-align: center; padding: 32px 20px; color: var(--muted); }
+  .empty-state .empty-icon { font-size: 40px; margin-bottom: 10px; }
+  .empty-state p { font-size: 14px; line-height: 1.5; }
+  .toast { position: fixed; bottom: calc(var(--safe-bottom) + 20px); left: 50%; transform: translateX(-50%) translateY(20px); background: var(--accent); color: #0d0f14; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.5px; padding: 10px 20px; border-radius: 30px; opacity: 0; transition: all 0.3s; z-index: 999; pointer-events: none; white-space: nowrap; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .install-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: flex-end; padding: 16px; }
+  .install-modal.open { display: flex; }
+  .install-box { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 24px; width: 100%; }
+  .install-box h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 800; margin-bottom: 16px; }
+  .install-step { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 14px; }
+  .install-step-num { background: var(--accent); color: #0d0f14; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 14px; flex-shrink: 0; }
+  .install-step-text { font-size: 14px; line-height: 1.5; padding-top: 3px; }
+  .install-step-text strong { color: var(--accent); }
+  .install-close { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 13px; color: var(--text); font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; margin-top: 4px; }
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="header-left">
+    <h1>DC <span>RUNS</span></h1>
+    <p>From Brookland Metro</p>
+  </div>
+  <div class="header-badge" onclick="document.getElementById('install-modal').classList.add('open')">+ Home Screen</div>
+</div>
+<div class="tabs">
+  <div class="tab active" data-tab="all" onclick="switchTab('all')">All</div>
+  <div class="tab" data-tab="inout" onclick="switchTab('inout')">↔ In & Out</div>
+  <div class="tab" data-tab="runto" onclick="switchTab('runto')">🚇 Run → Train</div>
+  <div class="tab" data-tab="trainrun" onclick="switchTab('trainrun')">🚇 Train → Run</div>
+  <div class="tab" data-tab="drive" onclick="switchTab('drive')">🚗 Drive</div>
+  <div class="tab" data-tab="progress" onclick="switchTab('progress')">📈 Progress</div>
+</div>
+<div class="main">
+  <div class="screen active" id="screen-routes">
+    <div class="section-label" id="label-inout">
+      <div class="section-dot" style="background:var(--run)"></div>
+      <div class="section-title">In & Out — No Car, No Train</div>
+      <div class="section-line"></div>
+    </div>
+    <div class="route-card" data-cat="inout" onclick="toggleCard(this)">
+      <div class="card-header">
+        <div class="card-icon" style="background:rgba(232,240,96,0.12)">🏃</div>
+        <div class="card-info">
+          <div class="card-name">Metropolitan Branch Trail</div>
+          <div class="card-meta">
+            <span class="pill highlight">2 – 5 mi</span>
+            <span class="pill">Paved</span>
+            <span class="pill">From your door</span>
+          </div>
+        </div>
+        <div class="card-chevron">›</div>
+      </div>
+      <div class="card-body">
+        <div class="card-section">
+          <div class="card-section-title">Route Steps</div>
+          <div class="steps">
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(232,240,96,0.15);color:var(--accent)">1</div><div class="step-line"></div></div><div class="step-content"><div class="step-label">Start at Brookland-CUA Metro</div><div class="step-desc">MBT trailhead is right at the station. Head south on the paved trail.</div></div></div>
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(232,240,96,0.15);color:var(--accent)">2</div><div class="step-line"></div></div><div class="step-content"><div class="step-label">Run to your goal distance ÷ 2</div><div class="step-desc">2 mi total? Turn at mile 1. 4 mi total? Turn at mile 2. Pass NoMa station at ~mile 1.7.</div><span class="step-badge" style="background:rgba(232,240,96,0.15);color:var(--accent)">Landmark: NoMa-Gallaudet at ~1.7 mi</span></div></div>
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(232,240,96,0.15);color:var(--accent)">3</div></div><div class="step-content"><div class="step-label">Turn around & run back to Brookland</div><div class="step-desc">Same trail back. Flat, well-lit, vibrant murals along the way.</div></div></div>
+          </div>
+        </div>
+        <div class="card-section"><div class="metro-box"><div class="metro-row"><span style="font-size:16px">✅</span><span style="color:var(--text);font-size:13px">Start and finish at Brookland Metro — no transit required.</span></div></div></div>
+        <div class="card-section"><a class="map-btn" style="background:var(--accent)" href="https://maps.apple.com/?q=Metropolitan+Branch+Trail+Washington+DC" target="_blank">🗺 Open in Maps</a></div>
+      </div>
+    </div>
+    <div class="route-card" data-cat="inout" onclick="toggleCard(this)">
+      <div class="card-header">
+        <div class="card-icon" style="background:rgba(232,240,96,0.12)">🌊</div>
+        <div class="card-info">
+          <div class="card-name">Anacostia Riverwalk Trail</div>
+          <div class="card-meta">
+            <span class="pill highlight">4 – 5 mi</span>
+            <span class="pill">Paved</span>
+            <span class="pill">River views</span>
+          </div>
+        </div>
+        <div class="card-chevron">›</div>
+      </div>
+      <div class="card-body">
+        <div class="card-section">
+          <div class="card-section-title">Route Steps</div>
+          <div class="steps">
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(232,240,96,0.15);color:var(--accent)">1</div><div class="step-line"></div></div><div class="step-content"><div class="step-label">Start at Brookland-CUA Metro</div><div class="step-desc">Head south on the Metropolitan Branch Trail.</div></div></div>
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(232,240,96,0.15);color:var(--accent)">2</div><div class="step-line"></div></div><div class="step-content"><div class="step-label">Pass NoMa (~1.7 mi) & continue south</div><div class="step-desc">Continue past NoMa station heading toward the Anacostia River.</div></div></div>
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(232,240,96,0.15);color:var(--accent)">3</div><div class="step-line"></div></div><div class="step-content"><div class="step-label">Connect to Anacostia Riverwalk (~2 mi)</div><div class="step-desc">Run along the river, then turn around.</div><span class="step-badge" style="background:rgba(232,240,96,0.15);color:var(--accent)">Flat, paved, scenic river path</span></div></div>
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(232,240,96,0.15);color:var(--accent)">4</div></div><div class="step-content"><div class="step-label">Return on MBT to Brookland</div><div class="step-desc">Retrace north on the MBT back to the station. ~4–5 miles total.</div></div></div>
+          </div>
+        </div>
+        <div class="card-section"><div class="metro-box"><div class="metro-row"><span style="font-size:16px">✅</span><span style="color:var(--text);font-size:13px">Full out-and-back from Brookland. No transit required.</span></div></div></div>
+        <div class="card-section"><a class="map-btn" style="background:var(--accent)" href="https://maps.apple.com/?q=Anacostia+Riverwalk+Trail+Washington+DC" target="_blank">🗺 Open in Maps</a></div>
+      </div>
+    </div>
+    <div class="section-label" id="label-runto">
+      <div class="section-dot" style="background:var(--train-to)"></div>
+      <div class="section-title">Run To → Train Back</div>
+      <div class="section-line"></div>
+    </div>
+    <div class="route-card" data-cat="runto" onclick="toggleCard(this)">
+      <div class="card-header">
+        <div class="card-icon" style="background:rgba(96,196,240,0.12)">⛲</div>
+        <div class="card-info">
+          <div class="card-name">Meridian Hill Park</div>
+          <div class="card-meta">
+            <span class="pill" style="background:rgba(96,196,240,0.12);color:var(--train-to)">2.5 mi run</span>
+            <span class="pill">Green Line back</span>
+            <span class="pill">~20 min home</span>
+          </div>
+        </div>
+        <div class="card-chevron">›</div>
+      </div>
+      <div class="card-body">
+        <div class="card-section">
+          <div class="card-section-title">Route Steps</div>
+          <div class="steps">
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(96,196,240,0.15);color:var(--train-to)">1</div><div class="step-line"></div></div><div class="step-content"><div class="step-label">Start at Brookland-CUA Metro</div><div class="step-desc">Join MBT at the station, head south.</div></div></div>
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(96,196,240,0.15);color:var(--train-to)">2</div><div class="step-line"></div></div><div class="step-content"><div class="step-label">Pass NoMa-Gallaudet (~1.7 mi)</div><div class="step-desc">Keep going south — don't stop, just a landmark.</div><span class="step-badge" style="background:rgba(96,196,240,0.15);color:var(--train-to)">Landmark: NoMa Metro at ~1.7 mi</span></div></div>
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(96,196,240,0.15);color:var(--train-to)">3</div><div class="step-line"></div></div><div class="step-content"><div class="step-label">Exit MBT near Florida Ave NW</div><div class="step-desc">Head west on Florida Ave NW then north to 16th St NW.</div></div></div>
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(96,196,240,0.15);color:var(--train-to)">4</div></div><div class="step-content"><div class="step-label">Arrive at Meridian Hill Park (~2.5 mi)</div><div class="step-desc">Cool down at the cascading fountain. Walk 10 min south to Columbia Heights Metro.</div></div></div>
+          </div>
+        </div>
+        <div class="card-section">
+          <div class="card-section-title">Metro Home</div>
+          <div class="metro-box">
+            <div class="metro-row"><div class="metro-dot" style="background:#00a84f"></div><span class="metro-label">Board</span><span class="metro-val">Columbia Heights (Green Line)</span></div>
+            <div class="metro-row"><span style="font-size:14px">🔄</span><span class="metro-label">Transfer</span><span class="metro-val">Fort Totten → Red Line</span></div>
+            <div class="metro-row"><div class="metro-dot" style="background:#e31837"></div><span class="metro-label">Exit</span><span class="metro-val">Brookland-CUA (~20 min)</span></div>
+          </div>
+        </div>
+        <div class="card-section"><a class="map-btn" style="background:var(--train-to)" href="https://maps.apple.com/?daddr=Meridian+Hill+Park,+Washington+DC&dirflg=w" target="_blank">🗺 Open in Maps</a></div>
+      </div>
+    </div>
+    <div class="route-card" data-cat="runto" onclick="toggleCard(this)">
+      <div class="card-header">
+        <div class="card-icon" style="background:rgba(96,196,240,0.12)">🏛</div>
+        <div class="card-info">
+          <div class="card-name">National Mall</div>
+          <div class="card-meta">
+            <span class="pill" style="background:rgba(96,196,240,0.12);color:var(--train-to)">4.5 mi run</span>
+            <span class="pill">Multiple lines back</span>
+            <span class="pill">Flat & iconic</span>
+          </div>
+        </div>
+        <div class="card-chevron">›</div>
+      </div>
+      <div class="card-body">
+        <div class="card-section">
+          <div class="card-section-title">Route Steps</div>
+          <div class="steps">
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(96,196,240,0.15);color:var(--train-to)">1</div><div class="step-line"></div></div><div class="step-content"><div class="step-label">Start at Brookland-CUA Metro</div><div class="step-desc">Head south on MBT toward NoMa.</div></div></div>
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(96,196,240,0.15);color:var(--train-to)">2</div><div class="step-line"></div></div><div class="step-content"><div class="step-label">Through NoMa toward Union Station (~2 mi)</div><div class="step-desc">Follow trail south, transition to streets near H St NE.</div></div></div>
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(96,196,240,0.15);color:var(--train-to)">3</div><div class="step-line"></div></div><div class="step-content"><div class="step-label">Run west along the National Mall (~4.5 mi)</div><div class="step-desc">Pass the Capitol, Washington Monument, Lincoln Memorial. Flat, paved.</div><span class="step-badge" style="background:rgba(96,196,240,0.15);color:var(--train-to)">Best run in DC — especially at sunrise</span></div></div>
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(96,196,240,0.15);color:var(--train-to)">4</div></div><div class="step-content"><div class="step-label">Finish & catch train home</div><div class="step-desc">Union Station, Smithsonian, or L'Enfant Plaza — multiple options nearby.</div></div></div>
+          </div>
+        </div>
+        <div class="card-section">
+          <div class="card-section-title">Metro Home</div>
+          <div class="metro-box">
+            <div class="metro-row"><div class="metro-dot" style="background:#e31837"></div><span class="metro-label">Option 1</span><span class="metro-val">Union Station → Red Line to Brookland</span></div>
+            <div class="metro-row"><div class="metro-dot" style="background:#009b3a"></div><span class="metro-label">Option 2</span><span class="metro-val">L'Enfant → Green to Fort Totten → Red Line</span></div>
+          </div>
+        </div>
+        <div class="card-section"><a class="map-btn" style="background:var(--train-to)" href="https://maps.apple.com/?q=National+Mall+Washington+DC" target="_blank">🗺 Open in Maps</a></div>
+      </div>
+    </div>
+    <div class="section-label" id="label-trainrun">
+      <div class="section-dot" style="background:var(--train-from)"></div>
+      <div class="section-title">Train To → Run Back</div>
+      <div class="section-line"></div>
+    </div>
+    <div class="route-card" data-cat="trainrun" onclick="toggleCard(this)">
+      <div class="card-header">
+        <div class="card-icon" style="background:rgba(160,96,240,0.12)">🌲</div>
+        <div class="card-info">
+          <div class="card-name">Rock Creek — Juniper Trailhead</div>
+          <div class="card-meta">
+            <span class="pill" style="background:rgba(160,96,240,0.12);color:var(--train-from)">3 – 5 mi run</span>
+            <span class="pill">Wooded trail</span>
+            <span class="pill">Red Line out</span>
+          </div>
+        </div>
+        <div class="card-chevron">›</div>
+      </div>
+      <div class="card-body">
+        <div class="card-section">
+          <div class="card-section-title">Getting There by Train</div>
+          <div class="metro-box">
+            <div class="metro-row"><div class="metro-dot" style="background:#e31837"></div><span class="metro-label">Board</span><span class="metro-val">Brookland → Red Line toward Shady Grove</span></div>
+            <div class="metro-row"><div class="metro-dot" style="background:#e31837"></div><span class="metro-label">Exit</span><span class="metro-val">Takoma Station (~3 stops)</span></div>
+            <div class="metro-row"><span style="font-size:14px">🚶</span><span class="metro-label">Walk</span><span class="metro-val">~10 min to Juniper Trailhead</span></div>
+          </div>
+        </div>
+        <div class="card-section">
+          <div class="card-section-title">Run Steps</div>
+          <div class="steps">
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(160,96,240,0.15);color:var(--train-from)">1</div><div class="step-line"></div></div><div class="step-content"><div class="step-label">Start at Juniper Trailhead</div><div class="step-desc">Pick up Rock Creek Trail heading south into the forest.</div></div></div>
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(160,96,240,0.15);color:var(--train-from)">2</div><div class="step-line"></div></div><div class="step-content"><div class="step-label">Run south 3–5 miles</div><div class="step-desc">Mix of natural and paved trail. Stay on Valley Trail (left of creek) for most scenic run.</div><span class="step-badge" style="background:rgba(160,96,240,0.15);color:var(--train-from)">Heads toward Brookland area</span></div></div>
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(160,96,240,0.15);color:var(--train-from)">3</div></div><div class="step-content"><div class="step-label">Exit toward Michigan Ave NE</div><div class="step-desc">Walk back to Brookland Metro from there.</div></div></div>
+          </div>
+        </div>
+        <div class="card-section"><a class="map-btn" style="background:var(--train-from)" href="https://maps.apple.com/?q=Rock+Creek+Trail+Juniper+Trailhead+Washington+DC" target="_blank">🗺 Open in Maps</a></div>
+      </div>
+    </div>
+    <div class="route-card" data-cat="trainrun" onclick="toggleCard(this)">
+      <div class="card-header">
+        <div class="card-icon" style="background:rgba(160,96,240,0.12)">💧</div>
+        <div class="card-info">
+          <div class="card-name">Sligo Creek Trail</div>
+          <div class="card-meta">
+            <span class="pill" style="background:rgba(160,96,240,0.12);color:var(--train-from)">2 – 4 mi run</span>
+            <span class="pill">Paved creek trail</span>
+            <span class="pill">Red Line out</span>
+          </div>
+        </div>
+        <div class="card-chevron">›</div>
+      </div>
+      <div class="card-body">
+        <div class="card-section">
+          <div class="card-section-title">Getting There by Train</div>
+          <div class="metro-box">
+            <div class="metro-row"><div class="metro-dot" style="background:#e31837"></div><span class="metro-label">Board</span><span class="metro-val">Brookland → Red Line toward Shady Grove</span></div>
+            <div class="metro-row"><div class="metro-dot" style="background:#e31837"></div><span class="metro-label">Exit</span><span class="metro-val">Silver Spring Station</span></div>
+            <div class="metro-row"><span style="font-size:14px">🚶</span><span class="metro-label">Walk</span><span class="metro-val">~8 min to Sligo Creek Trail entrance</span></div>
+          </div>
+        </div>
+        <div class="card-section">
+          <div class="card-section-title">Run Steps</div>
+          <div class="steps">
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(160,96,240,0.15);color:var(--train-from)">1</div><div class="step-line"></div></div><div class="step-content"><div class="step-label">Start at Sligo Creek Trail, Silver Spring end</div><div class="step-desc">Paved path alongside the creek through shaded woodland.</div></div></div>
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(160,96,240,0.15);color:var(--train-from)">2</div><div class="step-line"></div></div><div class="step-content"><div class="step-label">Run south 2–4 miles toward Takoma</div><div class="step-desc">Flat, shaded, quiet. Great for easy-pace runs.</div><span class="step-badge" style="background:rgba(160,96,240,0.15);color:var(--train-from)">Mostly flat — good for beginners</span></div></div>
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(160,96,240,0.15);color:var(--train-from)">3</div></div><div class="step-content"><div class="step-label">Exit near Takoma</div><div class="step-desc">Walk to Takoma Metro, take Red Line one stop back to Brookland.</div></div></div>
+          </div>
+        </div>
+        <div class="card-section"><a class="map-btn" style="background:var(--train-from)" href="https://maps.apple.com/?q=Sligo+Creek+Trail+Silver+Spring+MD" target="_blank">🗺 Open in Maps</a></div>
+      </div>
+    </div>
+    <div class="section-label" id="label-drive">
+      <div class="section-dot" style="background:var(--drive)"></div>
+      <div class="section-title">Drive To — 15–30 Min Away</div>
+      <div class="section-line"></div>
+    </div>
+    <div class="route-card" data-cat="drive" onclick="toggleCard(this)">
+      <div class="card-header">
+        <div class="card-icon" style="background:rgba(240,144,96,0.12)">🌿</div>
+        <div class="card-info">
+          <div class="card-name">National Arboretum</div>
+          <div class="card-meta">
+            <span class="pill" style="background:rgba(240,144,96,0.12);color:var(--drive)">~10 min drive</span>
+            <span class="pill">Free parking</span>
+            <span class="pill">Flexible loops</span>
+          </div>
+        </div>
+        <div class="card-chevron">›</div>
+      </div>
+      <div class="card-body">
+        <div class="card-section">
+          <div class="card-section-title">Driving & Parking</div>
+          <div class="metro-box">
+            <div class="metro-row"><span style="font-size:14px">🚗</span><span class="metro-label">Drive</span><span class="metro-val">~10 min east from Brookland</span></div>
+            <div class="metro-row"><span style="font-size:14px">🅿️</span><span class="metro-label">Park</span><span class="metro-val">Free lot at 3501 New York Ave NE</span></div>
+            <div class="metro-row"><span style="font-size:14px">🕗</span><span class="metro-label">Hours</span><span class="metro-val">8 AM – 5 PM daily</span></div>
+          </div>
+        </div>
+        <div class="card-section">
+          <div class="card-section-title">Run Options</div>
+          <div class="steps">
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(240,144,96,0.15);color:var(--drive)">2</div><div class="step-line"></div></div><div class="step-content"><div class="step-label">2 mi — Meadow Loop</div><div class="step-desc">Gentle loop around the entrance meadows. Flat and easy.</div></div></div>
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(240,144,96,0.15);color:var(--drive)">3</div><div class="step-line"></div></div><div class="step-content"><div class="step-label">3 mi — Bonsai + Capitol Columns Loop</div><div class="step-desc">Add the Bonsai Garden and the iconic National Capitol Columns.</div></div></div>
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(240,144,96,0.15);color:var(--drive)">5</div></div><div class="step-content"><div class="step-label">5 mi — Full Arboretum Circuit</div><div class="step-desc">Mix of paved roads and dirt paths. Hilly sections in the east.</div><span class="step-badge" style="background:rgba(240,144,96,0.15);color:var(--drive)">450 acres — new scenery every run</span></div></div>
+          </div>
+        </div>
+        <div class="card-section"><a class="map-btn" style="background:var(--drive)" href="https://maps.apple.com/?daddr=3501+New+York+Ave+NE+Washington+DC&dirflg=d" target="_blank">🗺 Get Directions</a></div>
+      </div>
+    </div>
+    <div class="route-card" data-cat="drive" onclick="toggleCard(this)">
+      <div class="card-header">
+        <div class="card-icon" style="background:rgba(240,144,96,0.12)">🪷</div>
+        <div class="card-info">
+          <div class="card-name">Kenilworth Aquatic Gardens</div>
+          <div class="card-meta">
+            <span class="pill" style="background:rgba(240,144,96,0.12);color:var(--drive)">~12 min drive</span>
+            <span class="pill">Free parking</span>
+            <span class="pill">River trail</span>
+          </div>
+        </div>
+        <div class="card-chevron">›</div>
+      </div>
+      <div class="card-body">
+        <div class="card-section">
+          <div class="card-section-title">Driving & Parking</div>
+          <div class="metro-box">
+            <div class="metro-row"><span style="font-size:14px">🚗</span><span class="metro-label">Drive</span><span class="metro-val">~12 min east from Brookland</span></div>
+            <div class="metro-row"><span style="font-size:14px">🅿️</span><span class="metro-label">Park</span><span class="metro-val">Free lot at 1550 Anacostia Ave NE</span></div>
+            <div class="metro-row"><span style="font-size:14px">🕗</span><span class="metro-label">Hours</span><span class="metro-val">8 AM – 4 PM daily</span></div>
+            <div class="metro-row"><span style="font-size:14px">🌸</span><span class="metro-label">Tip</span><span class="metro-val">Lotus blooms in early July — stunning</span></div>
+          </div>
+        </div>
+        <div class="card-section">
+          <div class="card-section-title">Run Steps</div>
+          <div class="steps">
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(240,144,96,0.15);color:var(--drive)">1</div><div class="step-line"></div></div><div class="step-content"><div class="step-label">Start at Kenilworth parking lot</div><div class="step-desc">Walk through the gardens to the boardwalk, then connect to Anacostia Riverwalk Trail.</div></div></div>
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(240,144,96,0.15);color:var(--drive)">2</div><div class="step-line"></div></div><div class="step-content"><div class="step-label">Run south on Anacostia Riverwalk</div><div class="step-desc">Flat, paved trail with open river views. Run 1–2.5 miles south then turn around.</div></div></div>
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(240,144,96,0.15);color:var(--drive)">3</div></div><div class="step-content"><div class="step-label">Return to parking lot</div><div class="step-desc">2–5 miles total depending on turnaround point.</div></div></div>
+          </div>
+        </div>
+        <div class="card-section"><a class="map-btn" style="background:var(--drive)" href="https://maps.apple.com/?daddr=1550+Anacostia+Ave+NE+Washington+DC&dirflg=d" target="_blank">🗺 Get Directions</a></div>
+      </div>
+    </div>
+    <div class="route-card" data-cat="drive" onclick="toggleCard(this)">
+      <div class="card-header">
+        <div class="card-icon" style="background:rgba(240,144,96,0.12)">🏞</div>
+        <div class="card-info">
+          <div class="card-name">Rock Creek Park</div>
+          <div class="card-meta">
+            <span class="pill" style="background:rgba(240,144,96,0.12);color:var(--drive)">~20 min drive</span>
+            <span class="pill">Mixed terrain</span>
+            <span class="pill">Multiple loops</span>
+          </div>
+        </div>
+        <div class="card-chevron">›</div>
+      </div>
+      <div class="card-body">
+        <div class="card-section">
+          <div class="card-section-title">Driving & Parking</div>
+          <div class="metro-box">
+            <div class="metro-row"><span style="font-size:14px">🚗</span><span class="metro-label">Drive</span><span class="metro-val">~20 min northwest from Brookland</span></div>
+            <div class="metro-row"><span style="font-size:14px">🅿️</span><span class="metro-label">Park</span><span class="metro-val">Free lots along Beach Drive NW</span></div>
+            <div class="metro-row"><span style="font-size:14px">📅</span><span class="metro-label">Tip</span><span class="metro-val">Beach Drive closed to cars on weekends</span></div>
+          </div>
+        </div>
+        <div class="card-section">
+          <div class="card-section-title">Run Options</div>
+          <div class="steps">
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(240,144,96,0.15);color:var(--drive)">2</div><div class="step-line"></div></div><div class="step-content"><div class="step-label">2 mi — Beach Drive Out & Back</div><div class="step-desc">Flat paved road, car-free on weekends. Easy and smooth.</div></div></div>
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(240,144,96,0.15);color:var(--drive)">3</div><div class="step-line"></div></div><div class="step-content"><div class="step-label">3 mi — Valley Trail Loop</div><div class="step-desc">Natural dirt trail through dense forest. Hilly and scenic.</div></div></div>
+            <div class="step"><div class="step-left"><div class="step-num" style="background:rgba(240,144,96,0.15);color:var(--drive)">5</div></div><div class="step-content"><div class="step-label">5 mi — Combined Loop</div><div class="step-desc">Mix Beach Drive and Valley Trail. Plan with Strava first.</div><span class="step-badge" style="background:rgba(240,144,96,0.15);color:var(--drive)">DC's best long-run destination</span></div></div>
+          </div>
+        </div>
+        <div class="card-section"><a class="map-btn" style="background:var(--drive)" href="https://maps.apple.com/?q=Rock+Creek+Park+Washington+DC&dirflg=d" target="_blank">🗺 Get Directions</a></div>
+      </div>
+    </div>
+  </div>
+  <div class="screen" id="screen-progress">
+    <div class="prog-hero">
+      <div class="prog-distance-label">Current Goal Distance</div>
+      <div><span class="prog-distance-val" id="prog-val">2</span><span class="prog-distance-unit"> mi</span></div>
+      <div class="prog-goal-label">Working toward <span>Marathon — 26.2 mi</span></div>
+      <div class="prog-bar-wrap">
+        <div class="prog-bar-label"><span>2 mi</span><span id="prog-pct">8%</span><span>26.2 mi</span></div>
+        <div class="prog-bar-track"><div class="prog-bar-fill" id="prog-bar" style="width:7.6%"></div></div>
+      </div>
+    </div>
+    <div class="milestones">
+      <div class="milestone-card reached" id="m2" onclick="setGoal(2)"><div class="milestone-icon">✅</div><div class="milestone-dist">2 mi</div><div class="milestone-label">Starting point</div></div>
+      <div class="milestone-card" id="m3" onclick="setGoal(3)"><div class="milestone-icon">⭕</div><div class="milestone-dist">3 mi</div><div class="milestone-label">Building base</div></div>
+      <div class="milestone-card" id="m5" onclick="setGoal(5)"><div class="milestone-icon">⭕</div><div class="milestone-dist">5 mi</div><div class="milestone-label">Solid fitness</div></div>
+      <div class="milestone-card" id="m10" onclick="setGoal(10)"><div class="milestone-icon">⭕</div><div class="milestone-dist">10 mi</div><div class="milestone-label">Double digits</div></div>
+      <div class="milestone-card" id="m13" onclick="setGoal(13.1)"><div class="milestone-icon">⭕</div><div class="milestone-dist">13.1 mi</div><div class="milestone-label">Half marathon</div></div>
+      <div class="milestone-card" id="m26" onclick="setGoal(26.2)"><div class="milestone-icon">🏆</div><div class="milestone-dist">26.2 mi</div><div class="milestone-label">The big one</div></div>
+    </div>
+    <div class="log-section">
+      <div class="log-title">Log a Run</div>
+      <div class="log-form">
+        <div class="log-row">
+          <div class="log-input-wrap"><label>Distance (mi)</label><input class="log-input" type="number" id="log-dist" placeholder="2.5" step="0.1" min="0"></div>
+          <div class="log-input-wrap"><label>Date</label><input class="log-input" type="date" id="log-date"></div>
+        </div>
+        <div class="log-row">
+          <div class="log-input-wrap"><label>Route</label>
+            <select class="log-select" id="log-route">
+              <option value="MBT">Metropolitan Branch Trail</option>
+              <option value="Anacostia">Anacostia Riverwalk</option>
+              <option value="Meridian Hill">Meridian Hill Park</option>
+              <option value="National Mall">National Mall</option>
+              <option value="Rock Creek (Train)">Rock Creek (Train)</option>
+              <option value="Sligo Creek">Sligo Creek Trail</option>
+              <option value="Arboretum">National Arboretum</option>
+              <option value="Kenilworth">Kenilworth Gardens</option>
+              <option value="Rock Creek (Drive)">Rock Creek Park (Drive)</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+        </div>
+        <button class="log-submit" onclick="logRun()">+ Log This Run</button>
+      </div>
+      <div class="log-title">Run History</div>
+      <div id="run-history" class="run-history"></div>
+    </div>
+  </div>
+</div>
+<div class="install-modal" id="install-modal" onclick="this.classList.remove('open')">
+  <div class="install-box" onclick="event.stopPropagation()">
+    <h2>Add to Home Screen 📱</h2>
+    <div class="install-step"><div class="install-step-num">1</div><div class="install-step-text">Open this page in <strong>Safari</strong> (not Chrome)</div></div>
+    <div class="install-step"><div class="install-step-num">2</div><div class="install-step-text">Tap the <strong>Share button</strong> (box with arrow at the bottom)</div></div>
+    <div class="install-step"><div class="install-step-num">3</div><div class="install-step-text">Scroll down and tap <strong>"Add to Home Screen"</strong></div></div>
+    <div class="install-step"><div class="install-step-num">4</div><div class="install-step-text">Tap <strong>Add</strong> — done! DC Runs lives on your home screen.</div></div>
+    <button class="install-close" onclick="document.getElementById('install-modal').classList.remove('open')">Got It</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+  let runs = [];
+  try { runs = JSON.parse(localStorage.getItem('dcRuns') || '[]'); } catch(e) {}
+  document.getElementById('log-date').valueAsDate = new Date();
+  function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+    const isProgress = tab === 'progress';
+    document.getElementById('screen-routes').classList.toggle('active', !isProgress);
+    document.getElementById('screen-progress').classList.toggle('active', isProgress);
+    if (isProgress) { renderHistory(); return; }
+    ['inout','runto','trainrun','drive'].forEach(cat => {
+      const show = tab === 'all' || tab === cat;
+      document.querySelectorAll(`.route-card[data-cat="${cat}"]`).forEach(c => c.style.display = show ? '' : 'none');
+      const lbl = document.getElementById(`label-${cat}`);
+      if (lbl) lbl.style.display = show ? '' : 'none';
+    });
+  }
+  function toggleCard(card) {
+    const was = card.classList.contains('expanded');
+    document.querySelectorAll('.route-card.expanded').forEach(c => c.classList.remove('expanded'));
+    if (!was) card.classList.add('expanded');
+  }
+  function setGoal(dist) {
+    document.getElementById('prog-val').textContent = dist;
+    const pct = Math.min(100, (dist / 26.2) * 100);
+    document.getElementById('prog-bar').style.width = pct + '%';
+    document.getElementById('prog-pct').textContent = Math.round(pct) + '%';
+    const map = { 2:'m2', 3:'m3', 5:'m5', 10:'m10', 13.1:'m13', 26.2:'m26' };
+    Object.entries(map).forEach(([d, id]) => {
+      const el = document.getElementById(id);
+      const reached = parseFloat(d) <= dist;
+      el.classList.toggle('reached', reached);
+      el.querySelector('.milestone-icon').textContent = reached ? '✅' : (parseFloat(d) === 26.2 ? '🏆' : '⭕');
+    });
+  }
+  function logRun() {
+    const dist = parseFloat(document.getElementById('log-dist').value);
+    const date = document.getElementById('log-date').value;
+    const route = document.getElementById('log-route').value;
+    if (!dist || dist <= 0) return;
+    runs.unshift({ dist, date, route, id: Date.now() });
+    try { localStorage.setItem('dcRuns', JSON.stringify(runs)); } catch(e) {}
+    document.getElementById('log-dist').value = '';
+    renderHistory();
+  }
+  function deleteRun(id) {
+    runs = runs.filter(r => r.id !== id);
+    try { localStorage.setItem('dcRuns', JSON.stringify(runs)); } catch(e) {}
+    renderHistory();
+  }
+  function renderHistory() {
+    const container = document.getElementById('run-history');
+    if (!runs.length) { container.innerHTML = `<div class="empty-state"><div class="empty-icon">👟</div><p>No runs logged yet.<br>Get out there and hit the MBT!</p></div>`; return; }
+    const emojis = { MBT:'🏃', Anacostia:'🌊', 'Meridian Hill':'⛲', 'National Mall':'🏛', 'Rock Creek (Train)':'🌲', 'Sligo Creek':'💧', Arboretum:'🌿', Kenilworth:'🪷', 'Rock Creek (Drive)':'🏞', Other:'📍' };
+    container.innerHTML = runs.map(r => {
+      const d = new Date(r.date + 'T12:00:00');
+      const ds = d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+      return `<div class="run-entry"><div class="run-entry-icon">${emojis[r.route]||'📍'}</div><div class="run-entry-info"><div class="run-entry-route">${r.route}</div><div class="run-entry-meta">${ds}</div></div><div class="run-entry-dist">${r.dist}<span> mi</span></div><button class="run-delete" onclick="deleteRun(${r.id})">✕</button></div>`;
+    }).join('');
+  }
+  renderHistory();
+</script>
+</body>
+</html>
